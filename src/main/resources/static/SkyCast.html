@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SkyCastDemo Weather Forecast</title>
+    <style>
+        #weatherResult img {
+            width: 50px;  /* 可根据需要调整图标大小 */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="top-container">
+    <h1>天气预报</h1>
+    <form id="weatherForm">
+        <label for="cityInput">城市名称/代码：</label>
+        <input type="text" id="cityInput" name="cityCode" required>
+        <button type="submit">查询</button>
+    </form>
+</div>
+<div id="weatherResult"></div>
+
+<script>
+    document.getElementById('weatherForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var cityCode = document.getElementById('cityInput').value;
+        fetch('/weather?cityCode=' + cityCode)
+            .then(response => response.json())
+            .then(data => {
+                var resultDiv = document.getElementById('weatherResult');
+                resultDiv.innerHTML = ''; // 清空当前结果
+
+                data.forEach(function(item) {
+                    if (item.endsWith('.gif')) {
+                        // 如果是图标文件名，显示图标
+                        var img = document.createElement('img');
+                        img.src = '/icons/' + item; // 设置图标的路径
+                            resultDiv.appendChild(img);
+                    } else {
+                        // 如果是文本信息，直接显示
+                        resultDiv.appendChild(document.createElement('br'));
+                        resultDiv.appendChild(document.createElement('div').appendChild(document.createTextNode(item)));
+                        resultDiv.appendChild(document.createElement('br'));
+                    }
+                });
+            })
+            .catch(error => {
+                // 错误处理
+                console.error('Error:', error);
+                document.getElementById('weatherResult').innerText = '查询错误，请检查城市名称/代码是否正确。';
+            });
+    });
+</script>
+<style>
+    .top-container{
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    div#weatherResult{
+        margin-top: 50px;
+        padding: 10px 30px 20px 50px;
+        align-items: flex-start;
+        line-height: 16px;
+        font-size: 16px;
+        font-family: "黑体";
+    }
+    img{
+        display: inline-block;
+        margin: 20px 20px 50px 20px;
+    }
+</style>
+</body>
+</html>
